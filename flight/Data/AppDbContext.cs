@@ -1,8 +1,9 @@
 ﻿using flight.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace flight.Data;
-public class AppDbContext : DbContext
+public class AppDbContext : IdentityDbContext<Users>
 {
     public DbSet<Flight> Flights { get; set; }
     public DbSet<Airline> Airlines { get; set; }

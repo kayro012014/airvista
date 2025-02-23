@@ -1,7 +1,6 @@
 ﻿using flight.Models;
-using System;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 public class Flight
 {
@@ -9,7 +8,7 @@ public class Flight
     public int Id { get; set; }
 
     [Required]
-    public string FlightCode { get; set; }
+    public string FlightCode { get; set; } = string.Empty;
 
     [Required]
     public int AirlineId { get; set; }
@@ -58,4 +57,17 @@ public class Flight
     [Required]
     [Column(TypeName = "decimal(18,2)")]
     public decimal FirstClassPrice { get; set; }
+
+    // Generate Flight Code using first 3 letters of Airline name + ID
+    public void GenerateFlightCode(string airlineName)
+    {
+        if (!string.IsNullOrEmpty(airlineName) && airlineName.Length >= 3)
+        {
+            FlightCode = $"{airlineName.Substring(0, 3).ToUpper()}-{Id}";
+        }
+        else
+        {
+            FlightCode = $"FL-{Id}"; // Fallback if airline name is too short
+        }
+    }
 }
