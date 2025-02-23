@@ -1,76 +1,85 @@
-﻿@using flight.Data
+﻿﻿@using flight.Data
 @model List<Flight>
 @inject AppDbContext _context;
 
 @{
     ViewData["Title"] = "Flights";
-    var airlines = _context.Airlines?.ToList() ?? new List<Airline>();
-    var airports = _context.Airports?.ToList() ?? new List<Airport>();
+    var airlines = _context.Airlines?.ToList() ?? new List<Airline>(); // Ensure no null
+    var airports = _context.Airports?.ToList() ?? new List<Airport>(); // Ensure no null
 }
 
 <div class="container">
     <h2>Create Flight</h2>
-    <form id="createFlightForm">
+    <form method="post" asp-action="Flights">
         <div class="row">
             <div class="col-md-6">
                 <label>Flight Code</label>
-                <input type="text" id="flightCode" class="form-control" disabled />
+                <input type="text" name="FlightCode" class="form-control" required />
 
                 <label>Airline</label>
-                <select id="airlineId" name="AirlineId" class="form-control" required>
+                <select name="AirlineId" class="form-control" required>
                     <option value="">Select Airline</option>
-                    @foreach (var airline in airlines)
+                    @if (airlines.Any())
                     {
-                        <option value="@airline.Id">@airline.Name</option>
+                        @foreach (var airline in airlines)
+                        {
+                            <option value="@airline.Id">@airline.Name</option>
+                        }
                     }
                 </select>
 
                 <label>Aircraft Code</label>
-                <input type="text" id="aircraftCode" name="AircraftCode" class="form-control" required />
+                <input type="text" name="AircraftCode" class="form-control" required />
 
                 <label>From Airport</label>
-                <select id="fromAirportId" name="FromAirportId" class="form-control" required>
+                <select name="FromAirportId" class="form-control" required>
                     <option value="">Select Airport</option>
-                    @foreach (var airport in airports)
+                    @if (airports.Any())
                     {
-                        <option value="@airport.Id">@airport.Name</option>
+                        @foreach (var airport in airports)
+                        {
+                            <option value="@airport.Id">@airport.Name</option>
+                        }
                     }
                 </select>
 
                 <label>To Airport</label>
-                <select id="toAirportId" name="ToAirportId" class="form-control" required>
+                <select name="ToAirportId" class="form-control" required>
                     <option value="">Select Airport</option>
-                    @foreach (var airport in airports)
+                    @if (airports.Any())
                     {
-                        <option value="@airport.Id">@airport.Name</option>
+                        @foreach (var airport in airports)
+                        {
+                            <option value="@airport.Id">@airport.Name</option>
+                        }
                     }
                 </select>
             </div>
 
             <div class="col-md-6">
                 <label>Departure Date & Time</label>
-                <input type="datetime-local" id="departureDateTime" name="DepartureDateTime" class="form-control" required />
+                <input type="datetime-local" name="DepartureDateTime" class="form-control" required />
 
                 <label>Estimated Arrival Date & Time</label>
-                <input type="datetime-local" id="arrivalDateTime" name="EstimatedArrivalDateTime" class="form-control" required />
+                <input type="datetime-local" name="EstimatedArrivalDateTime" class="form-control" required />
 
                 <label>Business Class Seats</label>
-                <input type="number" id="businessSeats" name="BusinessClassSeats" class="form-control" required />
+                <input type="number" name="BusinessClassSeats" class="form-control" required />
 
                 <label>Business Class Price</label>
-                <input type="number" id="businessPrice" name="BusinessClassPrice" class="form-control" step="0.01" required />
+                <input type="number" name="BusinessClassPrice" class="form-control" step="0.01" required />
 
                 <label>Economy Class Seats</label>
-                <input type="number" id="economySeats" name="EconomyClassSeats" class="form-control" required />
+                <input type="number" name="EconomyClassSeats" class="form-control" required />
 
                 <label>Economy Class Price</label>
-                <input type="number" id="economyPrice" name="EconomyClassPrice" class="form-control" step="0.01" required />
+                <input type="number" name="EconomyClassPrice" class="form-control" step="0.01" required />
 
                 <label>First Class Seats</label>
-                <input type="number" id="firstClassSeats" name="FirstClassSeats" class="form-control" required />
+                <input type="number" name="FirstClassSeats" class="form-control" required />
 
                 <label>First Class Price</label>
-                <input type="number" id="firstClassPrice" name="FirstClassPrice" class="form-control" step="0.01" required />
+                <input type="number" name="FirstClassPrice" class="form-control" step="0.01" required />
             </div>
         </div>
 
@@ -78,20 +87,21 @@
     </form>
 
     <h2 class="mt-5">Existing Flights</h2>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Flight Code</th>
-                <th>Airline</th>
-                <th>From</th>
-                <th>To</th>
-                <th>Departure</th>
-                <th>Arrival</th>
-            </tr>
-        </thead>
-        <tbody id="flightsList">
-            @if (Model != null && Model.Any())
-            {
+
+    @if (Model != null && Model.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Flight Code</th>
+                    <th>Airline</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Departure</th>
+                    <th>Arrival</th>
+                </tr>
+            </thead>
+            <tbody>
                 @foreach (var flight in Model)
                 {
                     <tr>
@@ -103,60 +113,11 @@
                         <td>@flight.EstimatedArrivalDateTime</td>
                     </tr>
                 }
-            }
-            else
-            {
-                <tr>
-                    <td colspan="6" class="text-center">No flights available.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No flights available.</p>
+    }
 </div>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $("#createFlightForm").submit(function (event) {
-            event.preventDefault(); // Prevent form reload
-
-               let formData = {
-        FlightCode: $("#flightCode").val(), // Ensure FlightCode is included
-        AirlineId: $("#airlineId").val(),
-        AircraftCode: $("#aircraftCode").val(),
-        FromAirportId: $("#fromAirportId").val(),
-        ToAirportId: $("#toAirportId").val(),
-        DepartureDateTime: $("#departureDateTime").val(),
-        EstimatedArrivalDateTime: $("#arrivalDateTime").val(),
-        BusinessClassSeats: parseInt($("#businessSeats").val()) || 0,
-        BusinessClassPrice: parseFloat($("#businessPrice").val()) || 0.0,
-        EconomyClassSeats: parseInt($("#economySeats").val()) || 0,
-        EconomyClassPrice: parseFloat($("#economyPrice").val()) || 0.0,
-        FirstClassSeats: parseInt($("#firstClassSeats").val()) || 0,
-        FirstClassPrice: parseFloat($("#firstClassPrice").val()) || 0.0
-    };
-
-            $.ajax({
-                url: "/Flights/CreateFlight",
-                type: "POST",
-                contentType: "application/json",
-                data: JSON.stringify(formData),
-                success: function (response) {
-                    let newRow = `<tr>
-                        <td>${response.flightCode}</td>
-                        <td>${response.airlineName}</td>
-                        <td>${response.fromAirport}</td>
-                        <td>${response.toAirport}</td>
-                        <td>${response.departureDateTime}</td>
-                        <td>${response.arrivalDateTime}</td>
-                    </tr>`;
-                    $("#flightsList").append(newRow);
-                    $("#createFlightForm")[0].reset();
-                },
-                error: function (xhr) {
-                    alert("Error: " + xhr.responseText);
-                }
-            });
-        });
-    });
-</script>
